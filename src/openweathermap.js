@@ -1,7 +1,25 @@
-var getWeather = function(){
-	//ページを取得してアレコレする
-	var response = HTTPGET ( "http://api.openweathermap.org/data/2.5/weather?q=Hakodate,JP");
-	//"&APPID=375cae36f97ac8ea716a681e9c708f1c"
+/*
+var geoget = navigator.geolocation.getCurrentPossition(function(position){
+		var lat = position.coords.latitude;
+		var lon = position.coords.longitude;
+		var geo = "lat=" + lat + "&lon=" + lon;
+		return geo;
+	});
+*/
+
+var getweather = function(){ //ページを取得してアレコレする
+	//現在地の取得
+	var getgeo = navigator.geolocation.getCurrentPossition(function(position){
+		var lat = position.coords.latitude;
+		var lon = position.coords.longitude;
+		var geo = "lat=" + lat + "&lon=" + lon;
+		return geo;
+	}); //ココでひっかかってできない
+	
+	//lat=xxx&lon=xxx
+	var response = HTTPGET ( "http://api.openweathermap.org/data/2.5/weather?" + getgeo);
+	//都市名なら"q=Hakodate,JP"
+	
 	var json = JSON.parse(response); //json形式に変換
 	//jsonの内容を展開
 	var temperature_c = Math.round (json.main.temp - 273.15); //前述jsonよりtemp-273.15を格納
@@ -11,7 +29,7 @@ var getWeather = function(){
 	var condition = json.weather[0].main;
 	
 	//logに結果を吐き出す
-	console.log("current tmp: " + temperature_c + "\nhigh_tmp" + temperature_h + "\nlow_tmp" + temperature_l + "\ncnd: " + condition　+ "\nlct: " + location + "\nres: " + response);
+	console.log("current tmp: " + temperature_c + "\nhigh_tmp" + temperature_h + "\nlow_tmp" + temperature_l + "\ncnd: " + condition　+ "\nlct: " + location + "\ngeo: " + getgeo);
 	
 	//c側へ送るための辞書を作成する
 	var dict = {
@@ -30,7 +48,8 @@ var getWeather = function(){
 Pebble.addEventListener("ready",
 	function(e) {
 		//pebbleから"ready"が送られてくるのを待って、以下のオシゴトをさせる
-		getWeather();
+		
+		getweather();
 	}
 );
 
