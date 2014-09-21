@@ -1,19 +1,124 @@
 {
     "appKeys": {
-        "KEY_CND": 4,
-        "KEY_C_TMP": 1,
-        "KEY_H_TMP": 2,
+        "KEY_CND1": 3,
+        "KEY_ICON1": 2,
         "KEY_LCT": 0,
-        "KEY_L_TMP": 3
+        "KEY_TMP1": 1
     },
     "capabilities": [
-        ""
+        "location"
     ],
     "companyName": "noondaymoon",
     "longName": "weather",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/tmpm.png",
+                "name": "TMPM",
+                "type": "png"
+            },
+            {
+                "file": "fonts/DroidSans.ttf",
+                "name": "FONT_DROID_18",
+                "type": "font"
+            },
+            {
+                "file": "fonts/DroidSans.ttf",
+                "name": "FONT_DROID_12",
+                "type": "font"
+            },
+            {
+                "file": "images/50n.png",
+                "name": "ICON_50N",
+                "type": "png"
+            },
+            {
+                "file": "images/50d.png",
+                "name": "ICON_50D",
+                "type": "png"
+            },
+            {
+                "file": "images/13n.png",
+                "name": "ICON_13N",
+                "type": "png"
+            },
+            {
+                "file": "images/13d.png",
+                "name": "ICON_13D",
+                "type": "png"
+            },
+            {
+                "file": "images/11n.png",
+                "name": "ICON_11N",
+                "type": "png"
+            },
+            {
+                "file": "images/11d.png",
+                "name": "ICON_11D",
+                "type": "png"
+            },
+            {
+                "file": "images/10n.png",
+                "name": "ICON_10N",
+                "type": "png"
+            },
+            {
+                "file": "images/10d.png",
+                "name": "ICON_10D",
+                "type": "png"
+            },
+            {
+                "file": "images/09n.png",
+                "name": "ICON_09N",
+                "type": "png"
+            },
+            {
+                "file": "images/09d.png",
+                "name": "ICON_09D",
+                "type": "png"
+            },
+            {
+                "file": "images/04n.png",
+                "name": "ICON_04N",
+                "type": "png"
+            },
+            {
+                "file": "images/04d.png",
+                "name": "ICON_04D",
+                "type": "png"
+            },
+            {
+                "file": "images/03n.png",
+                "name": "ICON_03N",
+                "type": "png"
+            },
+            {
+                "file": "images/03d.png",
+                "name": "ICON_03D",
+                "type": "png"
+            },
+            {
+                "file": "images/02n.png",
+                "name": "ICON_02N",
+                "type": "png"
+            },
+            {
+                "file": "images/02d.png",
+                "name": "ICON_02D",
+                "type": "png"
+            },
+            {
+                "file": "images/01n.png",
+                "name": "ICON_01N",
+                "type": "png"
+            },
+            {
+                "file": "images/01d.png",
+                "name": "ICON_01D",
+                "type": "png"
+            }
+        ]
     },
     "shortName": "weather",
     "uuid": "2374f53c-ade7-4222-811e-180dc2b4b0b2",

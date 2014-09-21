@@ -8,16 +8,26 @@ http://ninedof.wordpress.com/2014/02/02/pebble-sdk-2-0-tutorial-6-appmessage-for
 #include <pebble.h>
 
 //素材等の定義
+
+
+static Window *window;
+static TextLayer *condition1_layer;
+static TextLayer *temperature1_layer;
+static BitmapLayer *icon1_layer;
+static BitmapLayer *tmpm_layer;
+static TextLayer *location_layer;
+
+/*
 Window* window;
-TextLayer 	*title_layer,
-			*location_layer,
-			*temperature_c_layer,
-			*temperature_h_layer,
-			*temperature_l_layer,
-			*condition_layer,
-			*time_layer;
+TextLayer 	*location_layer,
+			*condition1_layer,
+			*temperature1_layer;
+
+BitmapLayer	*icon1_layer;
+
 
 //テキストレイヤをまとめて定義
+
 static TextLayer* init_text_layer(
 		GRect location,
 		GColor colour,
@@ -28,28 +38,27 @@ static TextLayer* init_text_layer(
 	TextLayer *layer = text_layer_create(location);
 	text_layer_set_text_color(layer, colour);
 	text_layer_set_background_color(layer, background);
-	text_layer_set_font(layer, fonts_get_system_font(res_id));
+	//text_layer_set_font(layer, fonts_get_system_font(res_id));
 	text_layer_set_text_alignment(layer, alignment);
 	
 	return layer;
 }
+*/
 
 //appmessageのラベルを定義(参考：http://wisdom.sakura.ne.jp/programming/c/c51.html)
 enum {
 	KEY_LCT		= 0,
-	KEY_C_TMP	= 1,
-	KEY_H_TMP	= 2,
-	KEY_L_TMP	= 3,
-	KEY_CND		= 4
+	KEY_TMP1	= 1,
+	KEY_ICON1	= 2,
+	KEY_CND1	= 3
+
 };
 
 //テキスト表示に使う変数の文字数も含めた定義
 char 	location_buffer[64],
-		temperature_c_buffer[32],
-		temperature_h_buffer[32],
-		temperature_l_buffer[32],
-		condition_buffer[64],
-		time_buffer[32];
+		temperature1_buffer[32],
+		icon1_buffer[32],
+		condition1_buffer[64];
 
 //変数の定義ここまで
 
@@ -69,42 +78,68 @@ void process_tuple(Tuple *t)
 	switch (key) {
 		case KEY_LCT:
 		//場所を取得した場合
-		snprintf (location_buffer, sizeof("Location : couldbereallylongname"), "Location: %s", string_value);
+		snprintf (location_buffer, sizeof("Location : couldbereallylongname"), "%s", string_value);
 		//snprintf（参考:http://www.c-tipsref.com/reference/stdio/snprintf.html）
 		text_layer_set_text(location_layer, (char*) &location_buffer);
 		break;
 		
-		case KEY_C_TMP:
+		case KEY_TMP1:
 		//気温を取得した場合
-		snprintf(temperature_c_buffer, sizeof("Temperature: XX \u00B0C"), "Temperature: %d \u00B0C", value);
+		snprintf(temperature1_buffer, sizeof("Temperature: XX \u00B0C"), "%d \u00B0C", value);
 		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
-		text_layer_set_text(temperature_c_layer, (char*) &temperature_c_buffer);
+		text_layer_set_text(temperature1_layer, (char*) &temperature1_buffer);
 		break;
 		
-		case KEY_H_TMP:
-		snprintf(temperature_h_buffer, sizeof("Temperature_h: XX \u00B0C"), "high: %d \u00B0C", value);
-		text_layer_set_text(temperature_h_layer, (char*) &temperature_h_buffer);
+		case KEY_ICON1:
+		if (strcmp(icon1_buffer, "01d") == 0){ //strcmp(a,b) == 0/1 : 文字列aとbが一致しているかどうかを判断。t/f。
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_01D));}
+		else if (strcmp(icon1_buffer, "02d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_02D));}
+		else if (strcmp(icon1_buffer, "03d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_03D));}
+		else if (strcmp(icon1_buffer, "04d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_04D));}
+		else if (strcmp(icon1_buffer, "09d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_09D));}
+		else if (strcmp(icon1_buffer, "10d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_10D));}
+		else if (strcmp(icon1_buffer, "11d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_11D));}
+		else if (strcmp(icon1_buffer, "13d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_13D));}
+		else if (strcmp(icon1_buffer, "50d") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_50D));}
+		else if (strcmp(icon1_buffer, "01n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_01N));}
+		else if (strcmp(icon1_buffer, "02n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_02N));}
+		else if (strcmp(icon1_buffer, "03n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_03N));}
+		else if (strcmp(icon1_buffer, "04n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_04N));}
+		else if (strcmp(icon1_buffer, "09n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_09N));}
+		else if (strcmp(icon1_buffer, "10n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_10N));}
+		else if (strcmp(icon1_buffer, "11n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_11N));}
+		else if (strcmp(icon1_buffer, "13n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_13N));}
+		else if (strcmp(icon1_buffer, "50n") == 0){
+			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_50N));}
 		break;
 		
-		case KEY_L_TMP:
-		snprintf(temperature_l_buffer, sizeof("Temperature_l: XX \u00B0C"), "low: %d \u00B0C", value);
-		text_layer_set_text(temperature_l_layer, (char*) &temperature_l_buffer);
-		break;
-		
-		case KEY_CND:
+		case KEY_CND1:
 		//天候を取得
-		snprintf (condition_buffer, sizeof("Condition : couldbereallylongname"), "Condition: %s", string_value);
-		text_layer_set_text(condition_layer, (char*) &condition_buffer);
+		snprintf (condition1_buffer, sizeof("Condition : couldbereallylongname"), "%s", string_value);
+		text_layer_set_text(condition1_layer, (char*) &condition1_buffer);
 		break;
 		
 	}
 	
 	// tに関する動作ここまで
 	// ついでに時間を取得
-	time_t temp = time(NULL);
-	struct tm *tm = localtime (&temp);
-	strftime (time_buffer, sizeof("Last updated: XX:XX"), "last updated: %H:%M", tm);
-	text_layer_set_text(time_layer, (char*) &time_buffer);
+
 }
 
 //appmessageの取り出し
@@ -127,52 +162,87 @@ static void in_received_handler (DictionaryIterator *iter, void *context)
 //windowに素材を配置
 void window_load (Window *window)
 	{
-	title_layer = init_text_layer(GRect(5, 0, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(title_layer, "Openweathermap.org");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(title_layer));
 	
-	location_layer = init_text_layer(GRect(5, 20, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(location_layer, "Location: N/A");
+	//condition1_layer
+	condition1_layer = text_layer_create(GRect(47, 38, 90, 18));
+  	text_layer_set_background_color(condition1_layer, GColorClear);
+ 	text_layer_set_text_color(condition1_layer, GColorWhite);
+  	text_layer_set_font(condition1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
+  	layer_add_child(window_get_root_layer(window), (Layer *)condition1_layer);
+  
+  	// temperature1_layer
+  	temperature1_layer = text_layer_create(GRect(67, 55, 70, 18));
+  	text_layer_set_background_color(temperature1_layer, GColorClear);
+  	text_layer_set_text_color(temperature1_layer, GColorWhite);
+  	text_layer_set_font(temperature1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
+  	layer_add_child(window_get_root_layer(window), (Layer *)temperature1_layer);
+  
+  	// icon1_layer
+  	icon1_layer = bitmap_layer_create(GRect(6, 38, 36, 36));
+  	layer_add_child(window_get_root_layer(window), (Layer *)icon1_layer);
+
+	//tmpm_layer
+	tmpm_layer = bitmap_layer_create(GRect(47, 54, 14, 14));
+	bitmap_layer_set_background_color(tmpm_layer, GColorClear);
+	bitmap_layer_set_bitmap(tmpm_layer, gbitmap_create_with_resource(RESOURCE_ID_TMPM));
+	layer_add_child(window_get_root_layer(window), (Layer *)tmpm_layer);
+	
+  	// location_layer
+  	location_layer = text_layer_create(GRect(5, 5, 100, 24));
+  	text_layer_set_background_color(location_layer, GColorClear);
+  	text_layer_set_text_color(location_layer, GColorWhite);
+  	text_layer_set_font(location_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_18)));
+  	layer_add_child(window_get_root_layer(window), (Layer *)location_layer);
+	
+	/*
+	location_layer = init_text_layer(GRect(10, 5, 100, 25), GColorWhite, GColorClear, "RESOURCE_ID_FONT_DROID_18", GTextAlignmentLeft);
+	text_layer_set_text(location_layer, "loading...");
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(location_layer));
 	
-	temperature_c_layer = init_text_layer(GRect(5, 40, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(temperature_c_layer, "Temperature: N/A");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(temperature_c_layer));
-	
-	temperature_h_layer = init_text_layer(GRect(5, 60, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(temperature_h_layer, "Last updated: N/A");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(temperature_h_layer));
-	
-	temperature_l_layer = init_text_layer(GRect(5, 80, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(temperature_l_layer, "Last updated: N/A");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(temperature_l_layer));
-	
-	condition_layer = init_text_layer(GRect(5, 100, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(condition_layer, "Condition: N/A");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(condition_layer));
-	
-	time_layer = init_text_layer(GRect(5, 120, 144, 20), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(time_layer, "Last updated: N/A");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
+	temperature1_layer = init_text_layer(GRect(84, 60, 50, 20), GColorWhite, GColorClear, "RESOURCE_ID_FONT_DROID_12", GTextAlignmentLeft);
+	text_layer_set_text(temperature1_layer, "");
+	layer_add_child(window_get_root_layer(window), text_layer_get_layer(temperature1_layer));
 
+	condition1_layer = init_text_layer(GRect(68, 38, 74, 17), GColorWhite, GColorClear, "RESOURCE_ID_FONT_DROID_12", GTextAlignmentLeft);
+	text_layer_set_text(condition1_layer, "");
+	layer_add_child(window_get_root_layer(window), text_layer_get_layer(condition1_layer));
+
+	icon1_layer = bitmap_layer_create(GRect(10, 80, 36, 36));
+	layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(icon1_layer));
+	*/
 }
 
 //windows素材の撤収
 void window_unload (Window *window)
 	{
-	text_layer_destroy(title_layer);
+	
+	window_destroy(window);
+  	text_layer_destroy(condition1_layer);
+  	text_layer_destroy(temperature1_layer);
+  	bitmap_layer_destroy(icon1_layer);
+	bitmap_layer_destroy(tmpm_layer);
+  	text_layer_destroy(location_layer);
+	
+	/*
 	text_layer_destroy(location_layer);
-	text_layer_destroy(temperature_c_layer);
-	text_layer_destroy(temperature_h_layer);
-	text_layer_destroy(temperature_l_layer);
-	text_layer_destroy(condition_layer);
-	text_layer_destroy(time_layer);	
+	text_layer_destroy(temperature1_layer);
+	text_layer_destroy(condition1_layer);
+	bitmap_layer_destroy(icon1_layer);
+	*/
 }
 
 //windowの表示を構成
 void init()
 	{
+	//コピペ
 	window = window_create();
+  	window_set_background_color(window, GColorBlack);
+ 	window_set_fullscreen(window, false);
+
+/*
+	window = window_create();
+	window_set_background_color(window, GColorBlack);
+*/
 	WindowHandlers handlers = {
 		.load = window_load,
 		.unload = window_unload,
