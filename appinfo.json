@@ -14,6 +14,11 @@
     "resources": {
         "media": [
             {
+                "file": "images/ex.png",
+                "name": "ICON_EX",
+                "type": "png"
+            },
+            {
                 "file": "images/tmpm.png",
                 "name": "TMPM",
                 "type": "png"

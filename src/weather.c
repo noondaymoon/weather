@@ -127,6 +127,7 @@ void process_tuple(Tuple *t)
 			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_13N));}
 		else if (strcmp(icon1_buffer, "50n") == 0){
 			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_50N));}
+		else {bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_EX));}
 		break;
 		
 		case KEY_CND1:
