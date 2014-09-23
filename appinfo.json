@@ -2,8 +2,14 @@
     "appKeys": {
         "KEY_CND1": 3,
         "KEY_ICON1": 2,
+        "KEY_ICON2": 5,
+        "KEY_ICON3": 7,
+        "KEY_ICON4": 9,
         "KEY_LCT": 0,
-        "KEY_TMP1": 1
+        "KEY_TMP1": 1,
+        "KEY_TMP2": 4,
+        "KEY_TMP3": 6,
+        "KEY_TMP4": 8
     },
     "capabilities": [
         "location"
@@ -13,6 +19,12 @@
     "projectType": "native",
     "resources": {
         "media": [
+            {
+                "file": "images/icon.png",
+                "menuIcon": true,
+                "name": "MENU_ICON",
+                "type": "png"
+            },
             {
                 "file": "images/ex.png",
                 "name": "ICON_EX",
@@ -25,102 +37,107 @@
             },
             {
                 "file": "fonts/DroidSans.ttf",
-                "name": "FONT_DROID_18",
-                "type": "font"
-            },
-            {
-                "file": "fonts/DroidSans.ttf",
                 "name": "FONT_DROID_12",
                 "type": "font"
             },
             {
+                "file": "fonts/DroidSans.ttf",
+                "name": "FONT_DROID_14",
+                "type": "font"
+            },
+            {
+                "file": "fonts/DroidSans.ttf",
+                "name": "FONT_DROID_22",
+                "type": "font"
+            },
+            {
                 "file": "images/50n.png",
-                "name": "ICON_50N",
+                "name": "ICON_50n",
                 "type": "png"
             },
             {
                 "file": "images/50d.png",
-                "name": "ICON_50D",
+                "name": "ICON_50d",
                 "type": "png"
             },
             {
                 "file": "images/13n.png",
-                "name": "ICON_13N",
+                "name": "ICON_13n",
                 "type": "png"
             },
             {
                 "file": "images/13d.png",
-                "name": "ICON_13D",
+                "name": "ICON_13d",
                 "type": "png"
             },
             {
                 "file": "images/11n.png",
-                "name": "ICON_11N",
+                "name": "ICON_11n",
                 "type": "png"
             },
             {
                 "file": "images/11d.png",
-                "name": "ICON_11D",
+                "name": "ICON_11d",
                 "type": "png"
             },
             {
                 "file": "images/10n.png",
-                "name": "ICON_10N",
+                "name": "ICON_10n",
                 "type": "png"
             },
             {
                 "file": "images/10d.png",
-                "name": "ICON_10D",
+                "name": "ICON_10d",
                 "type": "png"
             },
             {
                 "file": "images/09n.png",
-                "name": "ICON_09N",
+                "name": "ICON_09n",
                 "type": "png"
             },
             {
                 "file": "images/09d.png",
-                "name": "ICON_09D",
+                "name": "ICON_09d",
                 "type": "png"
             },
             {
                 "file": "images/04n.png",
-                "name": "ICON_04N",
+                "name": "ICON_04n",
                 "type": "png"
             },
             {
                 "file": "images/04d.png",
-                "name": "ICON_04D",
+                "name": "ICON_04d",
                 "type": "png"
             },
             {
                 "file": "images/03n.png",
-                "name": "ICON_03N",
+                "name": "ICON_03n",
                 "type": "png"
             },
             {
                 "file": "images/03d.png",
-                "name": "ICON_03D",
+                "name": "ICON_03d",
                 "type": "png"
             },
             {
                 "file": "images/02n.png",
-                "name": "ICON_02N",
+                "name": "ICON_02n",
                 "type": "png"
             },
             {
                 "file": "images/02d.png",
-                "name": "ICON_02D",
+                "name": "ICON_02d",
                 "type": "png"
             },
             {
                 "file": "images/01n.png",
-                "name": "ICON_01N",
+                "name": "ICON_01n",
                 "type": "png"
             },
             {
                 "file": "images/01d.png",
-                "name": "ICON_01D",
+                "name": "ICON_01d",
                 "type": "png"
             }
         ]
