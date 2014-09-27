@@ -1,6 +1,7 @@
 /*
 appmessageを利用した天気取得アプリの作成チュートリアル
 http://ninedof.wordpress.com/2014/02/02/pebble-sdk-2-0-tutorial-6-appmessage-for-pebblekit-js/
+からの改変
 */
 
 #include <pebble.h>
@@ -12,8 +13,6 @@ static TextLayer *time2_layer, *time3_layer,  *time4_layer;
 static TextLayer *temperature1_layer, *temperature2_layer, *temperature3_layer, *temperature4_layer;
 static BitmapLayer *icon1_layer, *icon2_layer, *icon3_layer, *icon4_layer;
 static BitmapLayer *tmpm_layer;
-
-
 
 //appmessageのラベルを定義(参考：http://wisdom.sakura.ne.jp/programming/c/c51.html)
 enum {
@@ -34,19 +33,19 @@ enum {
 };
 
 //テキスト表示に使う変数の文字数も含めた定義
-char 	location_buffer[32],
-		temperature1_buffer[8],
-		icon1_buffer[4],
-		condition1_buffer[64],
-		temperature2_buffer[8],
-		icon2_buffer[4],
-		time2_buffer[5],
-		temperature3_buffer[8],
-		icon3_buffer[4],
-		time3_buffer[5],
-		temperature4_buffer[8],
-		icon4_buffer[4],
-		time4_buffer[5];
+char 	location_buffer		[32],
+		temperature1_buffer	[8],
+		icon1_buffer		[4],
+		condition1_buffer	[64],
+		temperature2_buffer	[8],
+		icon2_buffer		[4],
+		time2_buffer		[5],
+		temperature3_buffer	[8],
+		icon3_buffer		[4],
+		time3_buffer		[5],
+		temperature4_buffer	[8],
+		icon4_buffer		[4],
+		time4_buffer		[5];
 
 //appmessageよりtに収納された情報の処理
 void process_tuple(Tuple *t)
@@ -67,7 +66,7 @@ void process_tuple(Tuple *t)
 		text_layer_set_text(location_layer, (char*) &location_buffer);
 		//text_layer_set_text(location_layer, "location"); //スクショ用
 		
-		//webの読み込み終わったら読み込みの必要がないを同時に配置する
+		//jsからのデータの処理が終わったらタイミングで画像を同時に配置する
 		bitmap_layer_set_bitmap(tmpm_layer, gbitmap_create_with_resource(RESOURCE_ID_TMPM));
 		break;
 		
@@ -81,10 +80,22 @@ void process_tuple(Tuple *t)
 		取得するiconの値をそのままコードに代入したい。できない。
 		
 		case KEY_ICON1:
-		snprintf (icon1_buffer, sizeof("RESOURCE_ID_ICON_xxx"), "RESOURCE_ID_ICON_%s", string_value);
+		snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
+		
 		bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(icon1_buffer));
 		break;
 		*/
+		
+		
+		//アスキーコードに変換してやればイケる気がする。
+		/*
+		case KEY_ICON1:
+		//snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
+		snprintf (icon1_buffer, sizeof("xxx"), "042", value);
+		bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(icon1_buffer));
+		break;
+		*/
+		
 		
 		case KEY_ICON1:
 		snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
@@ -127,6 +138,7 @@ void process_tuple(Tuple *t)
 			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_50n));}
 		else {bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_EX));}
 		break;
+		
 		
 		case KEY_ICON2:
 		snprintf (icon2_buffer, sizeof("xxx"), "%s", string_value);
@@ -262,11 +274,13 @@ void process_tuple(Tuple *t)
 		case KEY_TMP2:
 		snprintf(temperature2_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		text_layer_set_text(temperature2_layer, (char*) &temperature2_buffer);
+		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &temperature2_buffer);
 		break;
 		
 		case KEY_TMP3:
 		snprintf(temperature3_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		text_layer_set_text(temperature3_layer, (char*) &temperature3_buffer);
+		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &temperature3_buffer);
 		break;
 		
 		case KEY_TMP4:
