@@ -33,26 +33,26 @@ enum {
 };
 
 //テキスト表示に使う変数の文字数も含めた定義
-char 	location_buffer		[32],
-		temperature1_buffer	[8],
+char 	location_buffer		[16],
+		tmp1_buffer			[8],
 		icon1_buffer		[4],
-		condition1_buffer	[64],
-		temperature2_buffer	[8],
+		condition1_buffer	[16],
+		tmp2_buffer			[8],
 		icon2_buffer		[4],
 		time2_buffer		[5],
-		temperature3_buffer	[8],
+		tmp3_buffer			[8],
 		icon3_buffer		[4],
 		time3_buffer		[5],
-		temperature4_buffer	[8],
+		tmp4_buffer			[8],
 		icon4_buffer		[4],
-		time4_buffer		[5];
+		time4_buffer		[8];
 
 //appmessageよりtに収納された情報の処理
 void process_tuple(Tuple *t)
 	{
 	int key = t->key; //keyを取得
 	int value = t->value->int32; //数値の場合は数値として取得
-	char string_value[32];
+	char string_value[16];
 	strcpy (string_value, t->value->cstring); //文字列の場合は文字列として取得
 	//"strcpy"はstringをコピーする記述
 	
@@ -61,7 +61,7 @@ void process_tuple(Tuple *t)
 		
 		//場所を取得した場合
 		case KEY_LCT:
-		snprintf (location_buffer, sizeof("Location : couldbereallylongname"), "%s", string_value);
+		snprintf (location_buffer, sizeof("xxxxxxxxxx"), "%s", string_value);
 		//snprintf（参考:http://www.c-tipsref.com/reference/stdio/snprintf.html）
 		text_layer_set_text(location_layer, (char*) &location_buffer);
 		//text_layer_set_text(location_layer, "location"); //スクショ用
@@ -266,26 +266,26 @@ void process_tuple(Tuple *t)
 		
 		//気温を取得した場合
 		case KEY_TMP1:
-		snprintf(temperature1_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+		snprintf(tmp1_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
-		text_layer_set_text(temperature1_layer, (char*) &temperature1_buffer);
+		text_layer_set_text(temperature1_layer, (char*) &tmp1_buffer);
 		break;
 		
 		case KEY_TMP2:
-		snprintf(temperature2_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		text_layer_set_text(temperature2_layer, (char*) &temperature2_buffer);
+		snprintf(tmp2_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+		text_layer_set_text(temperature2_layer, (char*) &tmp2_buffer);
 		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &temperature2_buffer);
 		break;
 		
 		case KEY_TMP3:
-		snprintf(temperature3_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		text_layer_set_text(temperature3_layer, (char*) &temperature3_buffer);
+		snprintf(tmp3_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+		text_layer_set_text(temperature3_layer, (char*) &tmp3_buffer);
 		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &temperature3_buffer);
 		break;
 		
 		case KEY_TMP4:
-		snprintf(temperature4_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		text_layer_set_text(temperature4_layer, (char*) &temperature4_buffer);
+		snprintf(tmp4_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+		text_layer_set_text(temperature4_layer, (char*) &tmp4_buffer);
 		break;
 		
 		//時刻を取得した場合
@@ -302,6 +302,7 @@ void process_tuple(Tuple *t)
 		case KEY_TIME4:
 		snprintf(time4_buffer, sizeof("xx:xx"), "%s", string_value);
 		text_layer_set_text(time4_layer, (char*) &time4_buffer);
+		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &time4_buffer);
 		break;
 		
 	}
@@ -363,7 +364,7 @@ void window_load (Window *window)
   	layer_add_child(window_get_root_layer(window), (Layer *)temperature1_layer);
   
 	// time2_layer
-	time2_layer = text_layer_create(GRect(0, 82, 48, 18));
+	time2_layer = text_layer_create(GRect(2, 82, 48, 18));
 	text_layer_set_background_color(time2_layer, GColorClear);
 	text_layer_set_text_color(time2_layer, GColorWhite);
 	text_layer_set_font(time2_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -384,7 +385,7 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature2_layer);
 	
 	// time3_layer
-	time3_layer = text_layer_create(GRect(48, 82, 48, 18));
+	time3_layer = text_layer_create(GRect(51, 82, 48, 18));
 	text_layer_set_background_color(time3_layer, GColorClear);
 	text_layer_set_text_color(time3_layer, GColorWhite);
 	text_layer_set_font(time3_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -392,12 +393,12 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)time3_layer);
 	
 	// icon3_layer
-  	icon3_layer = bitmap_layer_create(GRect(48, 98, 48, 36));
+  	icon3_layer = bitmap_layer_create(GRect(50, 98, 48, 36));
 	bitmap_layer_set_alignment(icon3_layer, GAlignCenter);
   	layer_add_child(window_get_root_layer(window), (Layer *)icon3_layer);
 	
 	// temperature3_layer
-  	temperature3_layer = text_layer_create(GRect(48, 136, 48, 18));
+  	temperature3_layer = text_layer_create(GRect(49, 136, 48, 18));
   	text_layer_set_background_color(temperature3_layer, GColorClear);
   	text_layer_set_text_color(temperature3_layer, GColorWhite);
 	text_layer_set_font(temperature3_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -405,7 +406,7 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature3_layer);
 	
 	// time4_layer
-	time4_layer = text_layer_create(GRect(96, 82, 48, 18));
+	time4_layer = text_layer_create(GRect(98, 82, 48, 18));
 	text_layer_set_background_color(time4_layer, GColorClear);
 	text_layer_set_text_color(time4_layer, GColorWhite);
 	text_layer_set_font(time4_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -418,7 +419,7 @@ void window_load (Window *window)
   	layer_add_child(window_get_root_layer(window), (Layer *)icon4_layer);
 	
 	// temperature4_layer
-  	temperature4_layer = text_layer_create(GRect(96, 136, 48, 18));
+  	temperature4_layer = text_layer_create(GRect(98, 136, 48, 18));
   	text_layer_set_background_color(temperature4_layer, GColorClear);
   	text_layer_set_text_color(temperature4_layer, GColorWhite);
 	text_layer_set_font(temperature4_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
