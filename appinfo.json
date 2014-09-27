@@ -3,13 +3,16 @@
         "KEY_CND1": 3,
         "KEY_ICON1": 2,
         "KEY_ICON2": 5,
-        "KEY_ICON3": 7,
-        "KEY_ICON4": 9,
+        "KEY_ICON3": 8,
+        "KEY_ICON4": 11,
         "KEY_LCT": 0,
+        "KEY_TIME2": 6,
+        "KEY_TIME3": 9,
+        "KEY_TIME4": 12,
         "KEY_TMP1": 1,
         "KEY_TMP2": 4,
-        "KEY_TMP3": 6,
-        "KEY_TMP4": 8
+        "KEY_TMP3": 7,
+        "KEY_TMP4": 10
     },
     "capabilities": [
         "location"

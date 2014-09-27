@@ -8,7 +8,7 @@ http://ninedof.wordpress.com/2014/02/02/pebble-sdk-2-0-tutorial-6-appmessage-for
 static Window *window;
 static TextLayer *location_layer;
 static TextLayer *condition1_layer;
-static TextLayer *temperature2_hour_layer, *temperature3_hour_layer,  *temperature4_hour_layer;
+static TextLayer *time2_layer, *time3_layer,  *time4_layer;
 static TextLayer *temperature1_layer, *temperature2_layer, *temperature3_layer, *temperature4_layer;
 static BitmapLayer *icon1_layer, *icon2_layer, *icon3_layer, *icon4_layer;
 static BitmapLayer *tmpm_layer;
@@ -23,24 +23,30 @@ enum {
 	KEY_CND1	= 3,
 	KEY_TMP2	= 4,
 	KEY_ICON2	= 5,
-	KEY_TMP3	= 6,
-	KEY_ICON3	= 7,
-	KEY_TMP4	= 8,
-	KEY_ICON4	= 9,
+	KEY_TIME2	= 6,
+	KEY_TMP3	= 7,
+	KEY_ICON3	= 8,
+	KEY_TIME3	= 9,
+	KEY_TMP4	= 10,
+	KEY_ICON4	= 11,
+	KEY_TIME4	= 12,
 
 };
 
 //テキスト表示に使う変数の文字数も含めた定義
 char 	location_buffer[32],
-		temperature1_buffer[16],
+		temperature1_buffer[8],
 		icon1_buffer[4],
 		condition1_buffer[64],
-		temperature2_buffer[16],
+		temperature2_buffer[8],
 		icon2_buffer[4],
-		temperature3_buffer[16],
+		time2_buffer[5],
+		temperature3_buffer[8],
 		icon3_buffer[4],
-		temperature4_buffer[16],
-		icon4_buffer[4];
+		time3_buffer[5],
+		temperature4_buffer[8],
+		icon4_buffer[4],
+		time4_buffer[5];
 
 //appmessageよりtに収納された情報の処理
 void process_tuple(Tuple *t)
@@ -53,8 +59,9 @@ void process_tuple(Tuple *t)
 	
 	//ここから動作
 	switch (key) {
-		case KEY_LCT:
+		
 		//場所を取得した場合
+		case KEY_LCT:
 		snprintf (location_buffer, sizeof("Location : couldbereallylongname"), "%s", string_value);
 		//snprintf（参考:http://www.c-tipsref.com/reference/stdio/snprintf.html）
 		text_layer_set_text(location_layer, (char*) &location_buffer);
@@ -62,9 +69,12 @@ void process_tuple(Tuple *t)
 		
 		//webの読み込み終わったら読み込みの必要がないを同時に配置する
 		bitmap_layer_set_bitmap(tmpm_layer, gbitmap_create_with_resource(RESOURCE_ID_TMPM));
-		text_layer_set_text(temperature2_hour_layer, "+3h");
-		text_layer_set_text(temperature3_hour_layer, "+6h");
-		text_layer_set_text(temperature4_hour_layer, "+12h");
+		break;
+		
+		//天候を取得
+		case KEY_CND1:
+		snprintf (condition1_buffer, sizeof("Condition : couldbereallylongname"), "%s", string_value);
+		text_layer_set_text(condition1_layer, (char*) &condition1_buffer);
 		break;
 		
 		/*
@@ -241,38 +251,43 @@ void process_tuple(Tuple *t)
 		else {bitmap_layer_set_bitmap(icon4_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_EX));}
 		break;
 		
-		case KEY_TMP1:
+		
 		//気温を取得した場合
-		snprintf(temperature1_buffer, sizeof("Temperature: XX \u00B0C"), "%d \u00B0C", value);
+		case KEY_TMP1:
+		snprintf(temperature1_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
 		text_layer_set_text(temperature1_layer, (char*) &temperature1_buffer);
 		break;
 		
 		case KEY_TMP2:
-		//気温を取得した場合
-		snprintf(temperature2_buffer, sizeof("Temperature: XX \u00B0C"), "%d \u00B0C", value);
-		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
+		snprintf(temperature2_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		text_layer_set_text(temperature2_layer, (char*) &temperature2_buffer);
 		break;
 		
 		case KEY_TMP3:
-		//気温を取得した場合
-		snprintf(temperature3_buffer, sizeof("Temperature: XX \u00B0C"), "%d \u00B0C", value);
-		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
+		snprintf(temperature3_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		text_layer_set_text(temperature3_layer, (char*) &temperature3_buffer);
 		break;
 		
 		case KEY_TMP4:
-		//気温を取得した場合
-		snprintf(temperature4_buffer, sizeof("Temperature: XX \u00B0C"), "%d \u00B0C", value);
-		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
+		snprintf(temperature4_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
 		text_layer_set_text(temperature4_layer, (char*) &temperature4_buffer);
 		break;
 		
-		case KEY_CND1:
-		//天候を取得
-		snprintf (condition1_buffer, sizeof("Condition : couldbereallylongname"), "%s", string_value);
-		text_layer_set_text(condition1_layer, (char*) &condition1_buffer);
+		//時刻を取得した場合
+		case KEY_TIME2:
+		snprintf(time2_buffer, sizeof("xx:xx"), "%s", string_value);
+		text_layer_set_text(time2_layer, (char*) &time2_buffer);
+		break;
+		
+		case KEY_TIME3:
+		snprintf(time3_buffer, sizeof("xx:xx"), "%s", string_value);
+		text_layer_set_text(time3_layer, (char*) &time3_buffer);
+		break;
+		
+		case KEY_TIME4:
+		snprintf(time4_buffer, sizeof("xx:xx"), "%s", string_value);
+		text_layer_set_text(time4_layer, (char*) &time4_buffer);
 		break;
 		
 	}
@@ -302,7 +317,7 @@ void window_load (Window *window)
 	{
 	
 	// location_layer
-  	location_layer = text_layer_create(GRect(5, 0, 144, 30));
+  	location_layer = text_layer_create(GRect(5, 2, 144, 30));
   	text_layer_set_background_color(location_layer, GColorClear);
   	text_layer_set_text_color(location_layer, GColorWhite);
   	text_layer_set_font(location_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_22)));
@@ -310,12 +325,12 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)location_layer);
 	
 	// icon1_layer
-  	icon1_layer = bitmap_layer_create(GRect(6, 35, 48, 36));
+  	icon1_layer = bitmap_layer_create(GRect(6, 38, 48, 36));
 	bitmap_layer_set_alignment(icon1_layer, GAlignLeft);
   	layer_add_child(window_get_root_layer(window), (Layer *)icon1_layer);
 	
 	//condition1_layer
-	condition1_layer = text_layer_create(GRect(48, 33, 90, 24));
+	condition1_layer = text_layer_create(GRect(48, 33, 98, 20));
   	text_layer_set_background_color(condition1_layer, GColorClear);
  	text_layer_set_text_color(condition1_layer, GColorWhite);
   	text_layer_set_font(condition1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_14)));
@@ -324,7 +339,6 @@ void window_load (Window *window)
 	//tmpm_layer
 	tmpm_layer = bitmap_layer_create(GRect(47, 54, 14, 14));
 	bitmap_layer_set_background_color(tmpm_layer, GColorClear);
-	//bitmap_layer_set_bitmap(tmpm_layer, gbitmap_create_with_resource(RESOURCE_ID_TMPM));
 	layer_add_child(window_get_root_layer(window), (Layer *)tmpm_layer);
 	
   	// temperature1_layer
@@ -334,14 +348,13 @@ void window_load (Window *window)
   	text_layer_set_font(temperature1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
   	layer_add_child(window_get_root_layer(window), (Layer *)temperature1_layer);
   
-	// temperature2_hour_layer
-	temperature2_hour_layer = text_layer_create(GRect(0, 82, 48, 18));
-	text_layer_set_background_color(temperature2_hour_layer, GColorClear);
-	text_layer_set_text_color(temperature2_hour_layer, GColorWhite);
-	text_layer_set_font(temperature2_hour_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
-  	//text_layer_set_text(temperature2_hour_layer, "+3h");
-	text_layer_set_text_alignment(temperature2_hour_layer, GTextAlignmentCenter);
-	layer_add_child(window_get_root_layer(window), (Layer *)temperature2_hour_layer);
+	// time2_layer
+	time2_layer = text_layer_create(GRect(0, 82, 48, 18));
+	text_layer_set_background_color(time2_layer, GColorClear);
+	text_layer_set_text_color(time2_layer, GColorWhite);
+	text_layer_set_font(time2_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
+  	text_layer_set_text_alignment(time2_layer, GTextAlignmentCenter);
+	layer_add_child(window_get_root_layer(window), (Layer *)time2_layer);
 	
 	// icon2_layer
   	icon2_layer = bitmap_layer_create(GRect(0, 98, 48, 36));
@@ -356,14 +369,13 @@ void window_load (Window *window)
   	text_layer_set_text_alignment(temperature2_layer, GTextAlignmentCenter);
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature2_layer);
 	
-	// temperature3_hour_layer
-	temperature3_hour_layer = text_layer_create(GRect(48, 82, 48, 18));
-	text_layer_set_background_color(temperature3_hour_layer, GColorClear);
-	text_layer_set_text_color(temperature3_hour_layer, GColorWhite);
-	text_layer_set_font(temperature3_hour_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
-  	//text_layer_set_text(temperature3_hour_layer, "+6h");
-	text_layer_set_text_alignment(temperature3_hour_layer, GTextAlignmentCenter);
-	layer_add_child(window_get_root_layer(window), (Layer *)temperature3_hour_layer);
+	// time3_layer
+	time3_layer = text_layer_create(GRect(48, 82, 48, 18));
+	text_layer_set_background_color(time3_layer, GColorClear);
+	text_layer_set_text_color(time3_layer, GColorWhite);
+	text_layer_set_font(time3_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
+  	text_layer_set_text_alignment(time3_layer, GTextAlignmentCenter);
+	layer_add_child(window_get_root_layer(window), (Layer *)time3_layer);
 	
 	// icon3_layer
   	icon3_layer = bitmap_layer_create(GRect(48, 98, 48, 36));
@@ -378,14 +390,13 @@ void window_load (Window *window)
   	text_layer_set_text_alignment(temperature3_layer, GTextAlignmentCenter);
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature3_layer);
 	
-	// temperature4_hour_layer
-	temperature4_hour_layer = text_layer_create(GRect(96, 82, 48, 18));
-	text_layer_set_background_color(temperature4_hour_layer, GColorClear);
-	text_layer_set_text_color(temperature4_hour_layer, GColorWhite);
-	text_layer_set_font(temperature4_hour_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
-  	//text_layer_set_text(temperature4_hour_layer, "+12h");
-	text_layer_set_text_alignment(temperature4_hour_layer, GTextAlignmentCenter);
-	layer_add_child(window_get_root_layer(window), (Layer *)temperature4_hour_layer);
+	// time4_layer
+	time4_layer = text_layer_create(GRect(96, 82, 48, 18));
+	text_layer_set_background_color(time4_layer, GColorClear);
+	text_layer_set_text_color(time4_layer, GColorWhite);
+	text_layer_set_font(time4_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
+  	text_layer_set_text_alignment(time4_layer, GTextAlignmentCenter);
+	layer_add_child(window_get_root_layer(window), (Layer *)time4_layer);
 	
 	// icon4_layer
   	icon4_layer = bitmap_layer_create(GRect(96, 98, 48, 36));
@@ -414,15 +425,15 @@ void window_unload (Window *window)
 		
 	bitmap_layer_destroy(icon2_layer);
   	text_layer_destroy(temperature2_layer);
-	text_layer_destroy(temperature2_hour_layer);
+	text_layer_destroy(time2_layer);
 	
 	bitmap_layer_destroy(icon3_layer);
   	text_layer_destroy(temperature3_layer);
-	text_layer_destroy(temperature3_hour_layer);
+	text_layer_destroy(time3_layer);
 	
 	bitmap_layer_destroy(icon4_layer);
   	text_layer_destroy(temperature4_layer);
-	text_layer_destroy(temperature4_hour_layer);
+	text_layer_destroy(time4_layer);
 	
 }
 
