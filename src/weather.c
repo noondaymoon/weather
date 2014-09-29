@@ -12,7 +12,7 @@ static TextLayer *condition1_layer;
 static TextLayer *time2_layer, *time3_layer,  *time4_layer;
 static TextLayer *temperature1_layer, *temperature2_layer, *temperature3_layer, *temperature4_layer;
 static BitmapLayer *icon1_layer, *icon2_layer, *icon3_layer, *icon4_layer;
-static BitmapLayer *tmpm_layer;
+static BitmapLayer *bg_layer, *tmpm_layer;
 
 //appmessageのラベルを定義(参考：http://wisdom.sakura.ne.jp/programming/c/c51.html)
 enum {
@@ -56,13 +56,14 @@ void process_tuple(Tuple *t)
 	strcpy (string_value, t->value->cstring); //文字列の場合は文字列として取得
 	//"strcpy"はstringをコピーする記述
 	
-	//ここから動作
+	//ここからdictより取得した値に対応する動作
 	switch (key) {
 		
 		//場所を取得した場合
 		case KEY_LCT:
 		snprintf (location_buffer, sizeof("xxxxxxxxxx"), "%s", string_value);
 		//snprintf（参考:http://www.c-tipsref.com/reference/stdio/snprintf.html）
+		
 		text_layer_set_text(location_layer, (char*) &location_buffer);
 		//text_layer_set_text(location_layer, "location"); //スクショ用
 		
@@ -77,25 +78,9 @@ void process_tuple(Tuple *t)
 		break;
 		
 		/*
-		取得するiconの値をそのままコードに代入したい。できない。
-		
-		case KEY_ICON1:
-		snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
-		
-		bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(icon1_buffer));
-		break;
+		取得するiconの値をそのままコードに代入したいんだケド、できない。
+		調べたらアスキーコードに変換すると不可能ではないらしいが…
 		*/
-		
-		
-		//アスキーコードに変換してやればイケる気がする。
-		/*
-		case KEY_ICON1:
-		//snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
-		snprintf (icon1_buffer, sizeof("xxx"), "042", value);
-		bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(icon1_buffer));
-		break;
-		*/
-		
 		
 		case KEY_ICON1:
 		snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
@@ -304,27 +289,22 @@ void process_tuple(Tuple *t)
 		text_layer_set_text(time4_layer, (char*) &time4_buffer);
 		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &time4_buffer);
 		break;
-		
 	}
-	
-	
 }
 
 //appmessageの取り出し
 static void in_received_handler (DictionaryIterator *iter, void *context)
 	{
 	(void) context;
-	
+
 	//データを取得し"t"に構造体として収納する
-	Tuple *t = dict_read_first(iter); //iterの中にある一番最初のmessageを見に行く
-	while (t!= NULL) //以下のジョブをmessageからnullが返ってくるまで繰り返す
+	Tuple *t = dict_read_first(iter);
+	while (t!= NULL) //以下のオシゴトをmessageからnullが返ってくるまで繰り返す
 		{
-		process_tuple(t); //messageの最初のヤツをtに収納
-		t = dict_read_next(iter); //次のヤツを同様にtに収納
-		
+		process_tuple(t);
+		t = dict_read_next(iter);
 	}
 }
-
 
 
 //windowに素材を配置
@@ -332,35 +312,46 @@ void window_load (Window *window)
 	{
 	
 	// location_layer
-  	location_layer = text_layer_create(GRect(5, 2, 144, 30));
+  	location_layer = text_layer_create(GRect(5, 1, 144, 30));
   	text_layer_set_background_color(location_layer, GColorClear);
   	text_layer_set_text_color(location_layer, GColorWhite);
   	text_layer_set_font(location_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_22)));
   	text_layer_set_text(location_layer, "loading...");
 	layer_add_child(window_get_root_layer(window), (Layer *)location_layer);
 	
+	//ここにbitmaplayer"background"を挿入
+	bg_layer = bitmap_layer_create(GRect(0, 33, 120, 42));
+	bitmap_layer_set_background_color(bg_layer, GColorClear);
+	bitmap_layer_set_bitmap(bg_layer, gbitmap_create_with_resource(RESOURCE_ID_BG));
+	layer_add_child(window_get_root_layer(window), (Layer *)bg_layer);
+	
 	// icon1_layer
-  	icon1_layer = bitmap_layer_create(GRect(6, 38, 48, 36));
-	bitmap_layer_set_alignment(icon1_layer, GAlignLeft);
+  	icon1_layer = bitmap_layer_create(GRect(0, 38, 48, 36));
+	bitmap_layer_set_alignment(icon1_layer, GAlignCenter);
+	bitmap_layer_set_compositing_mode(icon1_layer, GCompOpAssignInverted); //画像色反転
   	layer_add_child(window_get_root_layer(window), (Layer *)icon1_layer);
 	
+	//結果1のレイヤを反転処理
 	//condition1_layer
-	condition1_layer = text_layer_create(GRect(48, 33, 98, 20));
+	condition1_layer = text_layer_create(GRect(48, 35, 67, 20));
   	text_layer_set_background_color(condition1_layer, GColorClear);
- 	text_layer_set_text_color(condition1_layer, GColorWhite);
-  	text_layer_set_font(condition1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_14)));
-  	layer_add_child(window_get_root_layer(window), (Layer *)condition1_layer);
+ 	text_layer_set_text_color(condition1_layer, GColorBlack);
+  	text_layer_set_font(condition1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_B_14)));
+  	text_layer_set_text_alignment(condition1_layer, GTextAlignmentCenter);
+	layer_add_child(window_get_root_layer(window), (Layer *)condition1_layer);
   
 	//tmpm_layer
-	tmpm_layer = bitmap_layer_create(GRect(47, 54, 14, 14));
+	tmpm_layer = bitmap_layer_create(GRect(48, 55, 14, 14));
 	bitmap_layer_set_background_color(tmpm_layer, GColorClear);
+	bitmap_layer_set_compositing_mode(tmpm_layer, GCompOpAssignInverted);
 	layer_add_child(window_get_root_layer(window), (Layer *)tmpm_layer);
 	
   	// temperature1_layer
-  	temperature1_layer = text_layer_create(GRect(70, 55, 70, 18));
+  	temperature1_layer = text_layer_create(GRect(62, 55, 53, 18));
   	text_layer_set_background_color(temperature1_layer, GColorClear);
-  	text_layer_set_text_color(temperature1_layer, GColorWhite);
-  	text_layer_set_font(temperature1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
+  	text_layer_set_text_color(temperature1_layer, GColorBlack);
+	text_layer_set_text_alignment(temperature1_layer, GTextAlignmentCenter);
+  	text_layer_set_font(temperature1_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_B_12)));
   	layer_add_child(window_get_root_layer(window), (Layer *)temperature1_layer);
   
 	// time2_layer
@@ -385,7 +376,7 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature2_layer);
 	
 	// time3_layer
-	time3_layer = text_layer_create(GRect(51, 82, 48, 18));
+	time3_layer = text_layer_create(GRect(50, 82, 48, 18));
 	text_layer_set_background_color(time3_layer, GColorClear);
 	text_layer_set_text_color(time3_layer, GColorWhite);
 	text_layer_set_font(time3_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -398,7 +389,7 @@ void window_load (Window *window)
   	layer_add_child(window_get_root_layer(window), (Layer *)icon3_layer);
 	
 	// temperature3_layer
-  	temperature3_layer = text_layer_create(GRect(49, 136, 48, 18));
+  	temperature3_layer = text_layer_create(GRect(48, 136, 48, 18));
   	text_layer_set_background_color(temperature3_layer, GColorClear);
   	text_layer_set_text_color(temperature3_layer, GColorWhite);
 	text_layer_set_font(temperature3_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -406,7 +397,7 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature3_layer);
 	
 	// time4_layer
-	time4_layer = text_layer_create(GRect(98, 82, 48, 18));
+	time4_layer = text_layer_create(GRect(96, 82, 48, 18));
 	text_layer_set_background_color(time4_layer, GColorClear);
 	text_layer_set_text_color(time4_layer, GColorWhite);
 	text_layer_set_font(time4_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -419,7 +410,7 @@ void window_load (Window *window)
   	layer_add_child(window_get_root_layer(window), (Layer *)icon4_layer);
 	
 	// temperature4_layer
-  	temperature4_layer = text_layer_create(GRect(98, 136, 48, 18));
+  	temperature4_layer = text_layer_create(GRect(96, 136, 48, 18));
   	text_layer_set_background_color(temperature4_layer, GColorClear);
   	text_layer_set_text_color(temperature4_layer, GColorWhite);
 	text_layer_set_font(temperature4_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -431,6 +422,8 @@ void window_load (Window *window)
 //windows素材の撤収
 void window_unload (Window *window)
 	{
+	bitmap_layer_destroy(bg_layer);
+	
 	text_layer_destroy(location_layer);
 	bitmap_layer_destroy(tmpm_layer);
 	text_layer_destroy(condition1_layer);
@@ -466,11 +459,10 @@ void init()
 	};
 	window_set_window_handlers(window, handlers);
 	
-	//appmessage eventsを登録
+	//appmessage eventsを登録？
 	app_message_register_inbox_received(in_received_handler);
+	//appmessageの最大入出力数？
 	app_message_open (app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
-	//appmessageの最大入出力数
-	
 	window_stack_push(window, true);
 }
 
