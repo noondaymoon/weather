@@ -23,38 +23,43 @@ var getweather = function(){ //ページを取得してアレコレする
 		//前述jsonよりtempはf値なので-273.15してから小数点以下丸めて格納
 		
 		//日中に夜のアイコンが呼び出される問題を日出・日没時間を利用して解決する（日没-現在時刻と現在-日出時刻が両方とも+なら日中という扱いにする）
-		var icon1 = ((today.sys.sunset - Math.round((new Date())/1000)) > 0 && (Math.round((new Date())/1000) - today.sys.sunrise) > 0) ? today.weather[0].icon.slice(0,2) + "d" : today.weather[0].icon.slice(0,2) + "n";
+		var now = ((new Date(Math.round(new Date()/1000) * 1000)).getHours())*60 + new Date(Math.round(new Date()/1000) * 1000).getMinutes();
+		var sunrise = ((new Date((today.sys.sunrise) * 1000)).getHours())*60 + (new Date((today.sys.sunrise) * 1000)).getMinutes();
+		var sunset = ((new Date(today.sys.sunset * 1000)).getHours())*60 + (new Date(today.sys.sunrise * 1000)).getMinutes();
+		var icon1 = ((sunset - now) > 0 && (now - sunrise) > 0) ? today.weather[0].icon.slice(0,2) + "d" : today.weather[0].icon.slice(0,2) + "n";
+		
 		//if文は"?"と":"を使う三項演算子という方法で省略できる（参考: http://ja.wikibooks.org/wiki/JavaScript_If文の復習と、三項演算子）
 		//取得される日出・日没時間はunixtime小数点以下を丸めた値なので…new Date()で現在時間を取得、/1000でunixtime、Math.roundで小数点以下を丸めて同じ桁数にしている
-		
 		
 		var description1 = today.weather[0].main.toLowerCase();
 		
 		//以降、予報の値を適宜文字列操作し表示させる
 		//アイコンについては日付をまたいだ場合日出・日没時間を取得できないため06:00より18:00までを日中と判断させる。
+		
 		var temperature2 = Math.round (forcast.list[2].main.temp - 273.15);
 		//予報の時間を取得しxx:xxで表示する（参考：http://yut.hatenablog.com/entry/20111015/1318633937）
 		var time2 = new Date((forcast.list[2].dt)*1000); //new date()*1000でunixtime
 		var hour2 = (time2.getHours() < 10) ? "0" + time2.getHours() : time2.getHours();
 		var min2 = (time2.getMinutes() < 10) ? "0" + time2.getMinutes() : time2.getMinutes();
-		var icon2 = (time2.getHours() >= 6 && time2.getHours() <= 18) ? forcast.list[2].weather[0].icon.slice(0, 2) + "d" : forcast.list[2].weather[0].icon.slice(0, 2) + "n";
+		var icon2 = (sunset - ((time2.getHours()*60)+time2.getMinutes()) > 0 && ((time2.getHours() * 60) + time2.getMinutes()) - sunrise >0) ? forcast.list[2].weather[0].icon.slice(0, 2) + "d" : forcast.list[2].weather[0].icon.slice(0, 2) + "n";
 		
 		var temperature3 = Math.round (forcast.list[3].main.temp - 273.15);
 		var time3 = new Date((forcast.list[3].dt)*1000);
 		var hour3 = (time3.getHours() < 10) ? "0" + time3.getHours() : time3.getHours();
 		var min3 = (time3.getMinutes() < 10) ? "0" + time3.getMinutes() : time3.getMinutes();
-		var icon3 = (time3.getHours() >= 6 && time3.getHours() <= 18) ? forcast.list[3].weather[0].icon.slice(0, 2) + "d" : forcast.list[3].weather[0].icon.slice(0, 2) + "n";
-		
+		var icon3 = (sunset - ((time3.getHours()*60)+time3.getMinutes()) > 0 && ((time3.getHours() * 60) + time3.getMinutes()) - sunrise >0) ? forcast.list[3].weather[0].icon.slice(0, 2) + "d" : forcast.list[3].weather[0].icon.slice(0, 2) + "n";
+				
 		var temperature4 = Math.round (forcast.list[5].main.temp - 273.15);
 		var time4 = new Date((forcast.list[5].dt)*1000);
 		var hour4 = (time4.getHours() < 10) ? "0" + time4.getHours() : time4.getHours();
 		var min4 = (time4.getMinutes() < 10) ? "0" + time4.getMinutes() : time4.getMinutes();
-		var icon4 = (time4.getHours() >= 6 && time4.getHours() <= 18) ? forcast.list[5].weather[0].icon.slice(0, 2) + "d" : forcast.list[5].weather[0].icon.slice(0, 2) + "n";
-					
+		var icon4 = (sunset - ((time4.getHours()*60)+time4.getMinutes()) > 0 && ((time4.getHours() * 60) + time4.getMinutes()) - sunrise >0) ? forcast.list[5].weather[0].icon.slice(0, 2) + "d" : forcast.list[5].weather[0].icon.slice(0, 2) + "n";
+		
 	//logに結果を吐き出す
 		console.log(
 			"\nloc: " + location +
 			"\nstatus1 cnd: " + description1 + ",icon_id: " + icon1 + ",tmp: " + temperature1 +
+			"\nsunset: " + sunset + ",sunrise: " + sunrise + ",now: " + now +
 			"\nstatus2 icon_id: " + icon2 + ",tmp: " + temperature2 + ",time2: " + hour2+":"+min2 +
 			"\nstatus3 icon_id: " + icon3 + ",tmp: " + temperature3 + ",time3: " + hour3+":"+min3 +
 			"\nstatus4 icon_id: " + icon4 + ",tmp: " + temperature4 + ",time3: " + hour4+":"+min4 +

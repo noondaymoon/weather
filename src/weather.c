@@ -357,7 +357,7 @@ void window_load (Window *window)
   	layer_add_child(window_get_root_layer(window), (Layer *)temperature1_layer);
   
 	// time2_layer
-	time2_layer = text_layer_create(GRect(2, 82, 48, 18));
+	time2_layer = text_layer_create(GRect(0, 82, 48, 18));
 	text_layer_set_background_color(time2_layer, GColorClear);
 	text_layer_set_text_color(time2_layer, GColorWhite);
 	text_layer_set_font(time2_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -378,7 +378,7 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)temperature2_layer);
 	
 	// time3_layer
-	time3_layer = text_layer_create(GRect(50, 82, 48, 18));
+	time3_layer = text_layer_create(GRect(48, 82, 48, 18));
 	text_layer_set_background_color(time3_layer, GColorClear);
 	text_layer_set_text_color(time3_layer, GColorWhite);
 	text_layer_set_font(time3_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DROID_12)));
@@ -386,7 +386,7 @@ void window_load (Window *window)
 	layer_add_child(window_get_root_layer(window), (Layer *)time3_layer);
 	
 	// icon3_layer
-  	icon3_layer = bitmap_layer_create(GRect(50, 98, 48, 36));
+  	icon3_layer = bitmap_layer_create(GRect(48, 98, 48, 36));
 	bitmap_layer_set_alignment(icon3_layer, GAlignCenter);
   	layer_add_child(window_get_root_layer(window), (Layer *)icon3_layer);
 	
