@@ -24,27 +24,31 @@
         "media": [
             {
                 "characterRegex": "[0-9,a-z,:,\u00b0, ,C]",
+                "compatibility": "2.7",
                 "file": "fonts/DroidSans.ttf",
                 "name": "FONT_DROID_12",
                 "type": "font"
             },
             {
                 "characterRegex": "[a-z,\\-,.]",
+                "compatibility": "2.7",
                 "file": "fonts/DroidSans.ttf",
                 "name": "FONT_DROID_22",
                 "type": "font"
             },
             {
-                "characterRegex": "[0-9,a-z,:,\u00b0, ,C]",
+                "characterRegex": "[0-9,a-z]",
+                "compatibility": "2.7",
                 "file": "fonts/DroidSans-Bold.ttf",
-                "name": "FONT_DROID_B_12",
+                "name": "FONT_DROID_B_14",
                 "trackingAdjust": 1,
                 "type": "font"
             },
             {
-                "characterRegex": "[0-9,a-z]",
+                "characterRegex": "[0-9,a-z,:,\u00b0,-, ,C]",
+                "compatibility": "2.7",
                 "file": "fonts/DroidSans-Bold.ttf",
-                "name": "FONT_DROID_B_14",
+                "name": "FONT_DROID_B_12",
                 "trackingAdjust": 1,
                 "type": "font"
             },
@@ -164,7 +168,7 @@
     "shortName": "weather",
     "uuid": "2374f53c-ade7-4222-811e-180dc2b4b0b2",
     "versionCode": 1,
-    "versionLabel": "2.2",
+    "versionLabel": "2.3",
     "watchapp": {
         "watchface": false
     }
