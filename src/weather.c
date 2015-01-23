@@ -1,11 +1,4 @@
-/*
-appmessageを利用した天気取得アプリの作成チュートリアル
-http://ninedof.wordpress.com/2014/02/02/pebble-sdk-2-0-tutorial-6-appmessage-for-pebblekit-js/
-からの改変
-*/
-
 #include <pebble.h>
-
 static Window *window;
 static TextLayer *location_layer;
 static TextLayer *condition1_layer;
@@ -14,38 +7,45 @@ static TextLayer *temperature1_layer, *temperature2_layer, *temperature3_layer, 
 static BitmapLayer *icon1_layer, *icon2_layer, *icon3_layer, *icon4_layer;
 static BitmapLayer *bg_layer, *tmpm_layer;
 
+
 //appmessageのラベルを定義(参考：http://wisdom.sakura.ne.jp/programming/c/c51.html)
 enum {
-	KEY_LCT		= 0,
-	KEY_TMP1	= 1,
-	KEY_ICON1	= 2,
-	KEY_CND1	= 3,
-	KEY_TMP2	= 4,
-	KEY_ICON2	= 5,
-	KEY_TIME2	= 6,
-	KEY_TMP3	= 7,
-	KEY_ICON3	= 8,
-	KEY_TIME3	= 9,
-	KEY_TMP4	= 10,
-	KEY_ICON4	= 11,
-	KEY_TIME4	= 12,
+	KEY_STMP	= 0,
+	
+	KEY_LCT		= 2,
+	KEY_TMP1	= 3,
+	KEY_ICON1	= 4,
+	KEY_CND1	= 5,
+	KEY_TMP2	= 6,
+	KEY_ICON2	= 7,
+	KEY_TIME2	= 8,
+	KEY_TMP3	= 9,
+	KEY_ICON3	= 10,
+	KEY_TIME3	= 11,
+	KEY_TMP4	= 12,
+	KEY_ICON4	= 13,
+	KEY_TIME4	= 14,
 
 };
 
 //テキスト表示に使う変数の文字数も含めた定義
-char 	location_buffer		[16],
+char 	location_buffer		[32], //[+]16文字以上の地域があるので修正
 		tmp1_buffer			[8],
 		icon1_buffer		[4],
 		condition1_buffer	[16],
 		tmp2_buffer			[8],
 		icon2_buffer		[4],
-		time2_buffer		[5],
+		time2_buffer		[8],
+		hour2_buffer		[4],
 		tmp3_buffer			[8],
 		icon3_buffer		[4],
-		time3_buffer		[5],
+		time3_buffer		[8],
+		hour3_buffer		[4],
 		tmp4_buffer			[8],
 		icon4_buffer		[4],
-		time4_buffer		[8];
+		time4_buffer		[8],
+		stg_tmpunt			[4],
+		hour4_buffer		[4];
 
 //appmessageよりtに収納された情報の処理
 void process_tuple(Tuple *t)
@@ -55,13 +55,18 @@ void process_tuple(Tuple *t)
 	char string_value[16];
 	strcpy (string_value, t->value->cstring); //文字列の場合は文字列として取得
 	//"strcpy"はstringをコピーする記述
-	
+		
 	//ここからdictより取得した値に対応する動作
 	switch (key) {
 		
+		case KEY_STMP:
+		snprintf (stg_tmpunt, sizeof("x"), "%s", string_value);
+		APP_LOG(APP_LOG_LEVEL_INFO, "stg_tmpunt : %s", stg_tmpunt);
+		break;
+		
 		//場所を取得した場合
 		case KEY_LCT:
-		snprintf (location_buffer, sizeof("xxxxxxxxxx"), "%s", string_value);
+		snprintf (location_buffer, sizeof("xxxxxxxxxxxxxx"), "%s", string_value); //[+]文字列サイズ延長
 		//snprintf（参考:http://www.c-tipsref.com/reference/stdio/snprintf.html）
 		
 		text_layer_set_text(location_layer, (char*) &location_buffer);
@@ -70,6 +75,7 @@ void process_tuple(Tuple *t)
 		//jsからのデータの処理が終わったらタイミングで画像を同時に配置する
 		bitmap_layer_set_bitmap(tmpm_layer, gbitmap_create_with_resource(RESOURCE_ID_TMPM));
 		break;
+		
 		
 		//天候を取得
 		case KEY_CND1:
@@ -84,8 +90,20 @@ void process_tuple(Tuple *t)
 		イイ案を見つけるまでここは放置する。
 		*/
 		
+		/*
+		//作業中。任意の変数にアイコンID代入してif文を一掃する作戦
+		js側でアイコンidの数字と昼夜判定を切り離して別のkeyで送り出せばどうだろう？
+		tmpx_bufferの表示部(char*)&の記述を使えそう
+		
 		case KEY_ICON1:
 		snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
+		
+		APP_LOG(APP_LOG_LEVEL_INFO, "icon1_buffer: %s", icon1_buffer);
+		*/
+
+		case KEY_ICON1:
+		snprintf (icon1_buffer, sizeof("xxx"), "%s", string_value);
+		
 		if (strcmp(icon1_buffer, "01d") == 0){ 
 			//strcmp(a,b) == 0/1 : 文字列aとbが一致しているかどうかを判断。
 			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_01d));}
@@ -125,7 +143,6 @@ void process_tuple(Tuple *t)
 			bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_50n));}
 		else {bitmap_layer_set_bitmap(icon1_layer, gbitmap_create_with_resource(RESOURCE_ID_ICON_EX));}
 		break;
-		
 		
 		case KEY_ICON2:
 		snprintf (icon2_buffer, sizeof("xxx"), "%s", string_value);
@@ -252,47 +269,152 @@ void process_tuple(Tuple *t)
 		
 		
 		//気温を取得した場合
+		
 		case KEY_TMP1:
-		snprintf(tmp1_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
-		text_layer_set_text(temperature1_layer, (char*) &tmp1_buffer);
+		if(strcmp(stg_tmpunt, "F") == 0){
+			double tmp1f = (((9.0/5.0)*value)+32.0);
+			snprintf(tmp1_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp1f);
+			text_layer_set_text(temperature1_layer, (char*) &tmp1_buffer);
+		}
+		else{
+			snprintf(tmp1_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+			//"\u00b0C"は"\u"(ユニコード)+"00b0"(気温の◯記号)+"C"(celcious)というコトで"℃"を構成
+			text_layer_set_text(temperature1_layer, (char*) &tmp1_buffer);
+		}
 		break;
 		
 		case KEY_TMP2:
-		snprintf(tmp2_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		text_layer_set_text(temperature2_layer, (char*) &tmp2_buffer);
-		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &temperature2_buffer);
+		if(strcmp(stg_tmpunt, "F") == 0){
+			double tmp2f = (((9.0/5.0)*value)+32.0);			
+			snprintf(tmp2_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp2f);
+			text_layer_set_text(temperature2_layer, (char*) &tmp2_buffer);
+		}
+		else{
+			snprintf(tmp2_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+			text_layer_set_text(temperature2_layer, (char*) &tmp2_buffer);
+		}
 		break;
 		
 		case KEY_TMP3:
-		snprintf(tmp3_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		text_layer_set_text(temperature3_layer, (char*) &tmp3_buffer);
-		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &temperature3_buffer);
+		if(strcmp(stg_tmpunt, "F") == 0){
+			double tmp3f = (((9.0/5.0)*value)+32.0);			
+			snprintf(tmp3_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp3f);
+			text_layer_set_text(temperature3_layer, (char*) &tmp3_buffer);
+		}
+		else{
+			snprintf(tmp3_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+			text_layer_set_text(temperature3_layer, (char*) &tmp3_buffer);
+		}
 		break;
 		
 		case KEY_TMP4:
-		snprintf(tmp4_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
-		text_layer_set_text(temperature4_layer, (char*) &tmp4_buffer);
+		if(strcmp(stg_tmpunt, "F") == 0){
+			double tmp4f = (((9.0/5.0)*value)+32.0);			
+			snprintf(tmp4_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp4f);
+			text_layer_set_text(temperature4_layer, (char*) &tmp4_buffer);
+		}
+		else{
+			snprintf(tmp4_buffer, sizeof("XXXX \u00B0C"), "%d \u00B0C", value);
+			text_layer_set_text(temperature4_layer, (char*) &tmp4_buffer);
+		}
 		break;
 		
 		//時刻を取得した場合
 		case KEY_TIME2:
-		snprintf(time2_buffer, sizeof("xx:xx"), "%s", string_value);
+		
+		snprintf(hour2_buffer, sizeof("xx"), "%d", value);
+		
+		if (!clock_is_24h_style()){			
+			int hour2 = atoi(hour2_buffer);
+			int hour12_2 = 12;
+			if		(hour2 == 0) {snprintf(time2_buffer, sizeof("xx:xxx"),"%d:00a", hour12_2);}
+			else if (hour2 < 12 && hour2 > 0){snprintf(time2_buffer, sizeof("xx:xxx"),"%d:00a", hour2);}
+			else if (hour2 == 12) {snprintf(time2_buffer, sizeof("xx:xxx"),"%d:00p", hour12_2);}
+			else {
+				int hour2_12 = hour2-12;
+				snprintf(time2_buffer, sizeof("xx:xxx"),"%d:00p", hour2_12);
+			}
+		}
+		
+		else {
+			if (value < 10){
+				char dhour2[] = "0";
+				strcpy(time2_buffer, dhour2);
+				strcat(time2_buffer, hour2_buffer);
+			}
+			else{
+				strcpy(time2_buffer, hour2_buffer);
+			}
+			strcat(time2_buffer, ":00");
+		}
+		
 		text_layer_set_text(time2_layer, (char*) &time2_buffer);
 		break;
 		
 		case KEY_TIME3:
-		snprintf(time3_buffer, sizeof("xx:xx"), "%s", string_value);
+		snprintf(hour3_buffer, sizeof("xx"), "%d", value);
+		
+		if (!clock_is_24h_style()) {			
+			int hour3 = atoi(hour3_buffer);
+			int hour12_3 = 12;
+			if		(hour3 == 0) {snprintf(time3_buffer, sizeof("xx:xxx"),"%d:00a", hour12_3);}
+			else if (hour3 < 12 && hour3 > 0){snprintf(time3_buffer, sizeof("xx:xxx"),"%d:00a", hour3);}
+			else if (hour3 == 12) {snprintf(time3_buffer, sizeof("xx:xxx"),"%d:00p", hour12_3);}
+			else {
+				int hour3_12 = hour3-12;
+				snprintf(time3_buffer, sizeof("xx:xxx"),"%d:00p", hour3_12);
+			}
+		}
+		
+		else {
+			if (value < 10){
+				char dhour3[] = "0";
+				strcpy(time3_buffer, dhour3);
+				strcat(time3_buffer, hour3_buffer);
+			}
+			else{
+				strcpy(time3_buffer, hour3_buffer);
+			}
+			strcat(time3_buffer, ":00");
+		}
+		
 		text_layer_set_text(time3_layer, (char*) &time3_buffer);
 		break;
 		
 		case KEY_TIME4:
-		snprintf(time4_buffer, sizeof("xx:xx"), "%s", string_value);
+		snprintf(hour4_buffer, sizeof("xx"), "%d", value);
+		
+		if (!clock_is_24h_style()) {			
+			int hour4 = atoi(hour4_buffer);
+			int hour12_4 = 12;
+			if		(hour4 == 0) {snprintf(time4_buffer, sizeof("xx:xxx"),"%d:00a", hour12_4);}
+			else if (hour4 < 12 && hour4 > 0){snprintf(time4_buffer, sizeof("xx:xxx"),"%d:00a", hour4);}
+			else if (hour4 == 12) {snprintf(time4_buffer, sizeof("xx:xxx"),"%d:00p", hour12_4);}
+			else {
+				int hour4_12 = hour4-12;
+				snprintf(time4_buffer, sizeof("xx:xxx"),"%d:00p", hour4_12);
+			}
+		}
+		
+		else {
+			if (value < 10){
+				char dhour4[] = "0";
+				strcpy(time4_buffer, dhour4);
+				strcat(time4_buffer, hour4_buffer);
+			}
+			else{
+				strcpy(time4_buffer, hour4_buffer);
+			}
+			strcat(time4_buffer, ":00");
+		}
+		
 		text_layer_set_text(time4_layer, (char*) &time4_buffer);
-		//APP_LOG(APP_LOG_LEVEL_DEBUG, (char*) &time4_buffer);
 		break;
 	}
+	
+	vibes_short_pulse();
 }
+
 
 //appmessageの取り出し
 static void in_received_handler (DictionaryIterator *iter, void *context)
@@ -307,7 +429,6 @@ static void in_received_handler (DictionaryIterator *iter, void *context)
 		t = dict_read_next(iter);
 	}
 }
-
 
 //windowに素材を配置
 void window_load (Window *window)

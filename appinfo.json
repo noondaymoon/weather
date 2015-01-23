@@ -1,18 +1,20 @@
 {
     "appKeys": {
-        "KEY_CND1": 3,
-        "KEY_ICON1": 2,
-        "KEY_ICON2": 5,
-        "KEY_ICON3": 8,
-        "KEY_ICON4": 11,
-        "KEY_LCT": 0,
-        "KEY_TIME2": 6,
-        "KEY_TIME3": 9,
-        "KEY_TIME4": 12,
-        "KEY_TMP1": 1,
-        "KEY_TMP2": 4,
-        "KEY_TMP3": 7,
-        "KEY_TMP4": 10
+        "KEY_CND1": 5,
+        "KEY_ICON1": 4,
+        "KEY_ICON2": 7,
+        "KEY_ICON3": 10,
+        "KEY_ICON4": 13,
+        "KEY_LCT": 2,
+        "KEY_STIM": 1,
+        "KEY_STMP": 0,
+        "KEY_TIME2": 8,
+        "KEY_TIME3": 11,
+        "KEY_TIME4": 14,
+        "KEY_TMP1": 3,
+        "KEY_TMP2": 6,
+        "KEY_TMP3": 9,
+        "KEY_TMP4": 12
     },
     "capabilities": [
         "location"
@@ -23,17 +25,25 @@
     "resources": {
         "media": [
             {
-                "characterRegex": "[0-9,a-z,:,\u00b0, ,C]",
+                "characterRegex": "[a-z,\u0101,\u0113,\u012b,\u014d,\u016b,\\-, ,.]",
+                "compatibility": "2.7",
+                "file": "fonts/DroidSans.ttf",
+                "name": "FONT_DROID_22",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9,a-z,:,\u00b0, ,\\-,F,C]",
                 "compatibility": "2.7",
                 "file": "fonts/DroidSans.ttf",
                 "name": "FONT_DROID_12",
                 "type": "font"
             },
             {
-                "characterRegex": "[a-z,\\-,.]",
+                "characterRegex": "[0-9,a-z,:,\u00b0,\\-, ,F,C]",
                 "compatibility": "2.7",
-                "file": "fonts/DroidSans.ttf",
-                "name": "FONT_DROID_22",
+                "file": "fonts/DroidSans-Bold.ttf",
+                "name": "FONT_DROID_B_12",
+                "trackingAdjust": 1,
                 "type": "font"
             },
             {
@@ -41,14 +51,6 @@
                 "compatibility": "2.7",
                 "file": "fonts/DroidSans-Bold.ttf",
                 "name": "FONT_DROID_B_14",
-                "trackingAdjust": 1,
-                "type": "font"
-            },
-            {
-                "characterRegex": "[0-9,a-z,:,\u00b0,-, ,C]",
-                "compatibility": "2.7",
-                "file": "fonts/DroidSans-Bold.ttf",
-                "name": "FONT_DROID_B_12",
                 "trackingAdjust": 1,
                 "type": "font"
             },
@@ -168,7 +170,7 @@
     "shortName": "weather",
     "uuid": "2374f53c-ade7-4222-811e-180dc2b4b0b2",
     "versionCode": 1,
-    "versionLabel": "2.3",
+    "versionLabel": "2.45",
     "watchapp": {
         "watchface": false
     }
