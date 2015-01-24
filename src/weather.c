@@ -10,22 +10,20 @@ static BitmapLayer *bg_layer, *tmpm_layer;
 
 //appmessageのラベルを定義(参考：http://wisdom.sakura.ne.jp/programming/c/c51.html)
 enum {
-	KEY_STMP	= 0,
-	
-	KEY_LCT		= 2,
-	KEY_TMP1	= 3,
-	KEY_ICON1	= 4,
-	KEY_CND1	= 5,
-	KEY_TMP2	= 6,
-	KEY_ICON2	= 7,
-	KEY_TIME2	= 8,
-	KEY_TMP3	= 9,
-	KEY_ICON3	= 10,
-	KEY_TIME3	= 11,
-	KEY_TMP4	= 12,
-	KEY_ICON4	= 13,
-	KEY_TIME4	= 14,
-
+	KEY_UNIT	= 0,
+	KEY_LCT		= 1,
+	KEY_TMP1	= 2,
+	KEY_ICON1	= 3,
+	KEY_CND1	= 4,
+	KEY_TMP2	= 5,
+	KEY_ICON2	= 6,
+	KEY_TIME2	= 7,
+	KEY_TMP3	= 8,
+	KEY_ICON3	= 9,
+	KEY_TIME3	= 10,
+	KEY_TMP4	= 11,
+	KEY_ICON4	= 12,
+	KEY_TIME4	= 13,
 };
 
 //テキスト表示に使う変数の文字数も含めた定義
@@ -44,8 +42,20 @@ char 	location_buffer		[32], //[+]16文字以上の地域があるので修正
 		tmp4_buffer			[8],
 		icon4_buffer		[4],
 		time4_buffer		[8],
-		stg_tmpunt			[4],
+		tempunit			[4],
 		hour4_buffer		[4];
+
+static void acceltap (void) {
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+	
+	if (iter == NULL) {
+		return;
+	}
+	
+	app_message_outbox_send();
+}
+
 
 //appmessageよりtに収納された情報の処理
 void process_tuple(Tuple *t)
@@ -59,9 +69,8 @@ void process_tuple(Tuple *t)
 	//ここからdictより取得した値に対応する動作
 	switch (key) {
 		
-		case KEY_STMP:
-		snprintf (stg_tmpunt, sizeof("x"), "%s", string_value);
-		APP_LOG(APP_LOG_LEVEL_INFO, "stg_tmpunt : %s", stg_tmpunt);
+		case KEY_UNIT:
+		snprintf (tempunit, sizeof("x"), "%s", string_value);
 		break;
 		
 		//場所を取得した場合
@@ -271,7 +280,7 @@ void process_tuple(Tuple *t)
 		//気温を取得した場合
 		
 		case KEY_TMP1:
-		if(strcmp(stg_tmpunt, "F") == 0){
+		if(strcmp(tempunit, "F") == 0){
 			double tmp1f = (((9.0/5.0)*value)+32.0);
 			snprintf(tmp1_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp1f);
 			text_layer_set_text(temperature1_layer, (char*) &tmp1_buffer);
@@ -284,7 +293,7 @@ void process_tuple(Tuple *t)
 		break;
 		
 		case KEY_TMP2:
-		if(strcmp(stg_tmpunt, "F") == 0){
+		if(strcmp(tempunit, "F") == 0){
 			double tmp2f = (((9.0/5.0)*value)+32.0);			
 			snprintf(tmp2_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp2f);
 			text_layer_set_text(temperature2_layer, (char*) &tmp2_buffer);
@@ -296,7 +305,7 @@ void process_tuple(Tuple *t)
 		break;
 		
 		case KEY_TMP3:
-		if(strcmp(stg_tmpunt, "F") == 0){
+		if(strcmp(tempunit, "F") == 0){
 			double tmp3f = (((9.0/5.0)*value)+32.0);			
 			snprintf(tmp3_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp3f);
 			text_layer_set_text(temperature3_layer, (char*) &tmp3_buffer);
@@ -308,7 +317,7 @@ void process_tuple(Tuple *t)
 		break;
 		
 		case KEY_TMP4:
-		if(strcmp(stg_tmpunt, "F") == 0){
+		if(strcmp(tempunit, "F") == 0){
 			double tmp4f = (((9.0/5.0)*value)+32.0);			
 			snprintf(tmp4_buffer, sizeof("XXXX \u00B0F"), "%d \u00B0F", (int)tmp4f);
 			text_layer_set_text(temperature4_layer, (char*) &tmp4_buffer);
@@ -411,10 +420,8 @@ void process_tuple(Tuple *t)
 		text_layer_set_text(time4_layer, (char*) &time4_buffer);
 		break;
 	}
-	
 	vibes_short_pulse();
 }
-
 
 //appmessageの取り出し
 static void in_received_handler (DictionaryIterator *iter, void *context)
@@ -423,7 +430,7 @@ static void in_received_handler (DictionaryIterator *iter, void *context)
 
 	//データを取得し"t"に構造体として収納する
 	Tuple *t = dict_read_first(iter);
-	while (t!= NULL) //以下のオシゴトをmessageからnullが返ってくるまで繰り返す
+	while (t!= NULL) //以下をmessageからnullが返ってくるまで繰り返す
 		{
 		process_tuple(t);
 		t = dict_read_next(iter);
@@ -568,10 +575,13 @@ void window_unload (Window *window)
 	
 }
 
+static void accel_tap_handler(AccelAxisType axis, int32_t direction) {
+  acceltap();
+}
+
 //windowの表示を構成
 void init()
 	{
-	//コピペ
 	window = window_create();
   	window_set_background_color(window, GColorBlack);
  	window_set_fullscreen(window, false);
@@ -586,11 +596,27 @@ void init()
 	app_message_register_inbox_received(in_received_handler);
 	//appmessageの最大入出力数？
 	app_message_open (app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+	
+	/*
+	アプリ終了時に次回起動時に必要な変数を母艦アプリに保存する
+	persist_write_[bool/int/string/data]("keyname", "name");
+	
+	アプリ起動時に保存された変数を母艦アプリより読み出す
+	persist_read_[bool/int/string/data]("keyname", "name", sizeof("size"));
+	
+	参考：http://developer.getpebble.com/guides/pebble-apps/app-structure/persistent-storage/
+	*/
+	
+	persist_read_string(KEY_UNIT, tempunit, sizeof(tempunit));
+	
+	accel_tap_service_subscribe(accel_tap_handler);
 	window_stack_push(window, true);
 }
 
 void deinit ()
 	{
+	persist_write_string(KEY_UNIT, tempunit);
+	accel_tap_service_unsubscribe();
 	window_destroy (window);
 }
 

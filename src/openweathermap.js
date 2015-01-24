@@ -1,4 +1,4 @@
-var getweather = function(){
+var getweather = function(temp_unit){
 	
 	//現在地を取得
 	navigator.geolocation.getCurrentPosition(function(position) {
@@ -8,7 +8,7 @@ var getweather = function(){
 		//positionから緯度経度を取得
 		var lat = (Math.round(position.coords.latitude*100)/100);
 		var lon = (Math.round(position.coords.longitude*100)/100);
-				
+		
 		//openweathermap.orgへ現在地参照で天候をjsonで取得するリクエスト
 		var today_res = HTTPGET ( "http://api.openweathermap.org/data/2.5/weather?"+"lat=" + lat + "&lon=" + lon);
 		var forcast_res = HTTPGET ( "http://api.openweathermap.org/data/2.5/forecast?"+"lat=" + lat + "&lon=" + lon);
@@ -56,7 +56,7 @@ var getweather = function(){
 		
 	//c側へ送るための辞書を作成する
 		var dict = {
-			"KEY_STMP"	: "C",
+			"KEY_UNIT"	: temp_unit,
 			"KEY_LCT"	: location,
 			"KEY_TMP1"	: temperature1,
 			"KEY_ICON1"	: icon1,
@@ -78,10 +78,32 @@ var getweather = function(){
 	});
 };
 
+Pebble.addEventListener("showConfiguration",
+  function(e) {
+    Pebble.openURL("https://dl.dropboxusercontent.com/u/4570910/pebble/weather/config.html");
+  }
+);
+
+Pebble.addEventListener("webviewclosed",
+  function(e) {
+    //Get JSON dictionary
+    var configuration = JSON.parse(decodeURIComponent(e.response));
+	var temp_unit = configuration.temp_unit;
+	//console.log("response: " + e.response); //JSONの内容をログに出力
+	getweather(temp_unit);
+  }
+);
+
 //pebble用アプリと連携するための最初の記述
 Pebble.addEventListener("ready",
 	function(e) {
-		//pebbleから"ready"が送られてくるのを待って、以下のオシゴトをさせる
+		//pebbleから"ready"が送られてくるのを待って、以下の関数を行う
+		getweather();
+	}
+);
+
+Pebble.addEventListener("appmessage",
+	function(e) {
 		getweather();
 	}
 );
